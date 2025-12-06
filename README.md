@@ -1,4 +1,7 @@
+Fork of [WeebDataHoarder/go-away](https://github.com/WeebDataHoarder/go-away) for personal use. Fixes some issues with Firefox.
+
 ### <a id=why></a>
+
 # go-away
 
 Self-hosted abuse detection and rule enforcement against low-effort mass AI scraping and bots. Uses conventional non-nuclear options.
@@ -15,7 +18,7 @@ The tool is designed highly flexible so the operator can minimize impact to legi
 
 [Challenges](https://git.gammaspectra.live/git/go-away/wiki/Challenges) can be transparent (not shown to user, depends on backend or other logic), [non-JavaScript](#non-javascript-challenges) (challenges common browser properties), or [custom JavaScript](#custom-javascript-wasm-challenges) (from Proof of Work to fingerprinting or Captcha is supported)
 
-See _[Why do this?](#why-do-this)_ section for the challenges and reasoning behind this tool. 
+See _[Why do this?](#why-do-this)_ section for the challenges and reasoning behind this tool.
 
 **This documentation and go-away are in active development.** See [What's left?](#what-s-left) section for a breakdown.
 
@@ -23,7 +26,7 @@ Check this README for a general introduction. An [in-depth Wiki](https://git.gam
 
 ## Support
 
-If you have some suggestion or issue, feel free to open a [New Issue](https://git.gammaspectra.live/git/go-away/issues/new) on the repository. 
+If you have some suggestion or issue, feel free to open a [New Issue](https://git.gammaspectra.live/git/go-away/issues/new) on the repository.
 
 [Pull Requests](https://git.gammaspectra.live/git/go-away/pulls) are encouraged and desired.
 
@@ -49,7 +52,6 @@ See the [Installation page](https://git.gammaspectra.live/git/go-away/wiki/Insta
 
 go-away can be directly run from command line, via pre-built containers, or your own built containers.
 
-
 ## Features
 
 ### Rich rule matching
@@ -73,13 +75,11 @@ path (string) - HTTP request Path
 query (map[string]string) - HTTP request Query arguments
 headers (map[string]string) - HTTP request headers
 fp (map[string]string) - Available fingerprints
-  
+
 Only available when TLS is enabled
    fp.ja3n (string) JA3N TLS Fingerprint
    fp.ja4 (string) JA4 TLS Fingerprint
 ```
-
-
 
 ### Package path
 
@@ -95,8 +95,8 @@ Internal or external templates can be loaded to customize the look of the challe
 
 These templates are included by default:
 
-* `anubis`: An anubis-like themed challenge.
-* `forgejo`: Uses the Forgejo template and assets from your own instance. Supports specifying themes like `forgejo-auto`, `forgejo-light` and `forgejo-dark`.
+- `anubis`: An anubis-like themed challenge.
+- `forgejo`: Uses the Forgejo template and assets from your own instance. Supports specifying themes like `forgejo-auto`, `forgejo-light` and `forgejo-dark`.
 
 External templates for your site can be loaded specifying a full path to the `.gohtml` file. See [embed/templates/](embed/templates/) for examples to follow.
 
@@ -119,13 +119,21 @@ See the [Rule Actions page](https://git.gammaspectra.live/git/go-away/wiki/Rule-
 Several challenges can be offered as options for rules. This allows users that have passed other challenges before to not be affected.
 
 For example:
+
 ```yaml
-  - name: standard-browser
-    action: challenge
-    settings:
-      challenges: [http-cookie-check, preload-link, meta-refresh, resource-load, js-pow-sha256]
-    conditions:
-      - '($is-generic-browser)'
+- name: standard-browser
+  action: challenge
+  settings:
+    challenges:
+      [
+        http-cookie-check,
+        preload-link,
+        meta-refresh,
+        resource-load,
+        js-pow-sha256,
+      ]
+  conditions:
+    - "($is-generic-browser)"
 ```
 
 This rule has the user be checked against a backend, then attempts pass a few browser challenges.
@@ -181,21 +189,22 @@ The samples provide example network range fetching and rules for Googlebot / Bin
 Network ranges can be loaded via fetched JSON / TXT / HTML pages, or via lists. You can filter these using _jq_ or a regex.
 
 Example for _jq_:
+
 ```yaml
-  aws-cloud:
-    - url: https://ip-ranges.amazonaws.com/ip-ranges.json
-      jq-path: '(.prefixes[] | select(has("ip_prefix")) | .ip_prefix), (.prefixes[] | select(has("ipv6_prefix")) | .ipv6_prefix)'
+aws-cloud:
+  - url: https://ip-ranges.amazonaws.com/ip-ranges.json
+    jq-path: '(.prefixes[] | select(has("ip_prefix")) | .ip_prefix), (.prefixes[] | select(has("ipv6_prefix")) | .ipv6_prefix)'
 ```
 
 Example for _regex_:
-```yaml
-  cloudflare:
-    - url: https://www.cloudflare.com/ips-v4
-      regex: "(?P<prefix>[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/[0-9]+)"
-    - url: https://www.cloudflare.com/ips-v6
-      regex: "(?P<prefix>[0-9a-f:]+::/[0-9]+)"
-```
 
+```yaml
+cloudflare:
+  - url: https://www.cloudflare.com/ips-v4
+    regex: "(?P<prefix>[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/[0-9]+)"
+  - url: https://www.cloudflare.com/ips-v6
+    regex: "(?P<prefix>[0-9a-f:]+::/[0-9]+)"
+```
 
 ### Multiple backend support
 
@@ -218,22 +227,24 @@ This is tracked by tagging challenges with a readable flag indicating the type o
 The policy file at [examples/forgejo.yml](examples/forgejo.yml) provides a ready template to be used on your own Forgejo instance.
 
 Important notes:
-* Edit the `http-cookie-check` challenge, as this will fetch the listed backend with the given session cookie to check for user login.
-* Adjust the desired blocked networks or others. A template list of network ranges is provided, feel free to remove these if not needed.
-* Check the conditions and base rules to change your challenges offered and other ordering.
-* By default Googlebot / Bingbot / DuckDuckBot / Kagibot / Qwantbot / Yandexbot are allowed by useragent and network ranges.
+
+- Edit the `http-cookie-check` challenge, as this will fetch the listed backend with the given session cookie to check for user login.
+- Adjust the desired blocked networks or others. A template list of network ranges is provided, feel free to remove these if not needed.
+- Check the conditions and base rules to change your challenges offered and other ordering.
+- By default Googlebot / Bingbot / DuckDuckBot / Kagibot / Qwantbot / Yandexbot are allowed by useragent and network ranges.
 
 ### Generic
 
 The policy file at [examples/generic.yml](examples/generic.yml) provides a baseline to place on any site, that can be modified to fit your needs.
 
 Important notes:
-* Edit the `homesite` rule, as it's targeted to pages you always want to have available, like landing pages.
-* Edit the `is-static-asset` condition or the `allow-static-resources` rule to allow static file access as necessary.
-* If you have an API, add a PASS rule targeting it.
-* Check the conditions and base rules to change your challenges offered and other ordering.
-* Add or modify rules to target specific pages on your site as desired.
-* By default Googlebot / Bingbot / DuckDuckBot / Kagibot / Qwantbot / Yandexbot are allowed by useragent and network ranges.
+
+- Edit the `homesite` rule, as it's targeted to pages you always want to have available, like landing pages.
+- Edit the `is-static-asset` condition or the `allow-static-resources` rule to allow static file access as necessary.
+- If you have an API, add a PASS rule targeting it.
+- Check the conditions and base rules to change your challenges offered and other ordering.
+- Add or modify rules to target specific pages on your site as desired.
+- By default Googlebot / Bingbot / DuckDuckBot / Kagibot / Qwantbot / Yandexbot are allowed by useragent and network ranges.
 
 ### Snippets
 
@@ -241,9 +252,8 @@ You can define snippets to be included. YAML anchors/aliases are supported.
 
 See [examples/snippets/](examples/snippets/) for some defaults including indexer bots, challenges and other general matches.
 
-
-
 ## Why do this?
+
 In the past few years this small git instance has been hit by waves and waves of scraping.
 This was usually fought back by random useragent blocks for bots that did not follow [robots.txt](/robots.txt), until the past half year, where low-effort mass scraping was used more prominently.
 
@@ -255,21 +265,22 @@ At some point about 300Mbit/s of incoming requests (not including the responses)
 
 **If AI is so smart, why not just git clone the repositories?**
 
-* Wikimedia has posted about [How crawlers impact the operations of the Wikimedia projects](https://diff.wikimedia.org/2025/04/01/how-crawlers-impact-the-operations-of-the-wikimedia-projects/) [01/04/2025]
+- Wikimedia has posted about [How crawlers impact the operations of the Wikimedia projects](https://diff.wikimedia.org/2025/04/01/how-crawlers-impact-the-operations-of-the-wikimedia-projects/) [01/04/2025]
 
-* Xe (Anubis creator) has written about similar frustrations in several blogposts:
-  * [Amazon's AI crawler is making my git server unstable](https://xeiaso.net/notes/2025/amazon-crawler/) [01/17/2025]
-  * [Anubis works](https://xeiaso.net/notes/2025/anubis-works/) [04/12/2025]
+- Xe (Anubis creator) has written about similar frustrations in several blogposts:
+  - [Amazon's AI crawler is making my git server unstable](https://xeiaso.net/notes/2025/amazon-crawler/) [01/17/2025]
+  - [Anubis works](https://xeiaso.net/notes/2025/anubis-works/) [04/12/2025]
 
-* Drew DeVault (sourcehut) has posted several articles and outages regarding the same issues:
-  * [Drew Blog: Please stop externalizing your costs directly into my face](https://drewdevault.com/2025/03/17/2025-03-17-Stop-externalizing-your-costs-on-me.html) [17/03/2025]
-    * (fun tidbit: I'm the one quoted as having the feedback discussion interrupted to deal with bots!)
-   * [sourcehut status: LLM crawlers continue to DDoS SourceHut](https://status.sr.ht/issues/2025-03-17-git.sr.ht-llms/) [17/03/2025]
-  * [sourcehut Blog: You cannot have our user's data](https://sourcehut.org/blog/2025-04-15-you-cannot-have-our-users-data/) [15/04/2025]
+- Drew DeVault (sourcehut) has posted several articles and outages regarding the same issues:
+  - [Drew Blog: Please stop externalizing your costs directly into my face](https://drewdevault.com/2025/03/17/2025-03-17-Stop-externalizing-your-costs-on-me.html) [17/03/2025]
+    - (fun tidbit: I'm the one quoted as having the feedback discussion interrupted to deal with bots!)
+  - [sourcehut status: LLM crawlers continue to DDoS SourceHut](https://status.sr.ht/issues/2025-03-17-git.sr.ht-llms/) [17/03/2025]
+  - [sourcehut Blog: You cannot have our user's data](https://sourcehut.org/blog/2025-04-15-you-cannot-have-our-users-data/) [15/04/2025]
 
-* Others were also suffering at the same time [[1]](https://donotsta.re/notice/AreSNZlRlJv73AW7tI) [[2]](https://community.ipfire.org/t/suricata-ruleset-to-prevent-ai-scraping/11974) [[3]](https://gabrielsimmer.com/blog/stop-scraping-git-forge) [[4]](https://gabrielsimmer.com/blog/stop-scraping-git-forge) [[5]](https://blog.nytsoi.net/2025/03/01/obliterated-by-ai).
+- Others were also suffering at the same time [[1]](https://donotsta.re/notice/AreSNZlRlJv73AW7tI) [[2]](https://community.ipfire.org/t/suricata-ruleset-to-prevent-ai-scraping/11974) [[3]](https://gabrielsimmer.com/blog/stop-scraping-git-forge) [[4]](https://gabrielsimmer.com/blog/stop-scraping-git-forge) [[5]](https://blog.nytsoi.net/2025/03/01/obliterated-by-ai).
 
 ---
+
 Initially I deployed Anubis, and yeah, it does work!
 
 This tool started as a way to replace [Anubis](https://anubis.techaro.lol/) as it was not found as featureful as desired, and the impact was too high.
@@ -288,31 +299,29 @@ go-away offers a highly configurable set of challenges and rules that you can ad
 
 ## What's left?
 
-go-away has most of the desired features from the original checklist that was made in its development. 
+go-away has most of the desired features from the original checklist that was made in its development.
 However, a few points are left before go-away can be called v1.0.0:
 
-* [x] Several parts of the code are going through a refactor, which won't impact end users or operators.
-* [ ] Documentation is lacking and a more extensive one with inline example is in the works.
-* [x] Policy file syntax is going to stay mostly unchanged, except in the challenges definition section.
-* [ ] Allow end users to pick fallback challenges if any fail, specially with custom ones.
-* [ ] Replace Anubis-like default template with own one.
-* [x] Define strings and multi-language support for quick modification by operators without custom templates.
-* [ ] Have highly tested paths that match examples.
-* [x] Caching of temporary fetches, for example, network ranges.
-* [x] Allow live and dynamic policy reloading.
-* [x] Multiple domains / subdomains -> one backend handling, CEL rules for backends
-* [ ] Merge all rules and conditions into one large AST for higher performance.
-* [ ] Explore exposing a module for direct Caddy usage.
-* [x] More defined way of picking HTTP/HTTP(s) listeners and certificates.
-* [x] Expose metrics for challenge solve rates and acting on them.
-  * [ ] Metrics for common network ranges / AS / useragent
-
-
+- [x] Several parts of the code are going through a refactor, which won't impact end users or operators.
+- [ ] Documentation is lacking and a more extensive one with inline example is in the works.
+- [x] Policy file syntax is going to stay mostly unchanged, except in the challenges definition section.
+- [ ] Allow end users to pick fallback challenges if any fail, specially with custom ones.
+- [ ] Replace Anubis-like default template with own one.
+- [x] Define strings and multi-language support for quick modification by operators without custom templates.
+- [ ] Have highly tested paths that match examples.
+- [x] Caching of temporary fetches, for example, network ranges.
+- [x] Allow live and dynamic policy reloading.
+- [x] Multiple domains / subdomains -> one backend handling, CEL rules for backends
+- [ ] Merge all rules and conditions into one large AST for higher performance.
+- [ ] Explore exposing a module for direct Caddy usage.
+- [x] More defined way of picking HTTP/HTTP(s) listeners and certificates.
+- [x] Expose metrics for challenge solve rates and acting on them.
+  - [ ] Metrics for common network ranges / AS / useragent
 
 ## Other Similar Projects
 
 |                                         Project                                          |                                                                                                                                                      Source Code                                                                                                                                                      | Description                                                                                                                | Method                                       |
-|:----------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------|
+| :--------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
 |                          [Anubis](https://anubis.techaro.lol/)                           |                                       [![GitHub](https://img.shields.io/badge/GitHub-TecharoHQ/anubis-blue?style=flat&logo=github&labelColor=fff&logoColor=24292f)](https://github.com/TecharoHQ/anubis)<br/>Go / [MIT](https://github.com/TecharoHQ/anubis/blob/main/LICENSE)                                        | Proxy that uses JavaScript proof of work to weight request based on simple match rules                                     | JavaScript PoW (SHA-256)                     |
 |             [powxy](https://forge.lindenii.runxiyu.org/powxy/-/repos/powxy/)             |                  [![lindenii.runxiyu.org](https://img.shields.io/badge/lindenii-powxy-blue?style=flat&logo=git&labelColor=fff&logoColor=000)](https://forge.lindenii.runxiyu.org/powxy/-/repos/powxy/)<br/> Go / [BSD 2-Clause](https://forge.lindenii.runxiyu.org/powxy/-/repos/powxy/tree/LICENSE)                  | Powxy is a reverse proxy that protects your upstream service by challenging clients with proof-of-work.                    | JavaScript PoW (SHA-256) with manual program |
 |      [PoW! Bot Deterrent](https://git.sequentialread.com/forest/pow-bot-deterrent)       | [![SequentialRead](https://img.shields.io/badge/SequentialRead-forest/pow--bot--deterrent-blue?style=flat&logo=gitea&labelColor=fff&logoColor=000)](https://git.sequentialread.com/forest/pow-bot-deterrent)<br/> Go / [GPL v3.0](https://git.sequentialread.com/forest/pow-bot-deterrent/src/branch/main/LICENSE.md) | A proof-of-work based bot deterrent. Lightweight, self-hosted and copyleft licensed.                                       | JavaScript PoW (WASM scrypt)                 |
@@ -324,7 +333,3 @@ However, a few points are left before go-away can be called v1.0.0:
 ## Development
 
 This Go package can be used as a command on `git.gammaspectra.live/git/go-away/cmd/go-away` or a library under `git.gammaspectra.live/git/go-away/lib`
-
-
-
-
