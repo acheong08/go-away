@@ -36,8 +36,6 @@ var idCounter Id
 const DefaultDuration = time.Hour * 24 * 7
 
 var DefaultKeyHeaders = []string{
-	"Accept-Language",
-	// General browser information
 	"User-Agent",
 }
 
